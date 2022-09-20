@@ -1,2 +1,2 @@
-# documenta-owmsexpert
+# doc-wmsexpert
 Documentação WMS Expert
