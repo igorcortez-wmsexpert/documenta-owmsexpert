@@ -329,7 +329,8 @@ codFornecedorErp,
 tipo,
 dtEmissao,
 valTotProduto,
-valTotNotaFiscal
+valTotNotaFiscal,
+serie
 FROM NOTAFISCALENTRADA
 ```
 
@@ -342,7 +343,8 @@ FROM NOTAFISCALENTRADA
 **tipo:** *O campo deve ser **inteiro**, contendo o modelo do documento: Compra = 55, Devolução = 9, Transferencia = 8 e Produção = 11, Expresso = 2, o campo e **obrigatorio**.* <br />
 **dtEmissao:** *O campo deve ser **data** e deve conter a data de entrada da nota, campo e **obrigatorio**.* <br />
 **valTotProduto:** *O campo deve ser **numerico(18,2)** contendo a soma do valor total dos produtos, o campo e **obrigatorio**.* <br />
-**valTotNotaFiscal:** *O campo deve ser **numerico(15,2)** contendo o valor total da nota fiscal de entrada, o campo e **obrigatorio**.* <br /><br />
+**valTotNotaFiscal:** *O campo deve ser **numerico(15,2)** contendo o valor total da nota fiscal de entrada, o campo e **obrigatorio**.* <br />
+**serie:** *O campo deve ser **inteiro** contendo a serie da nota fiacal, o campo e **obrigatorio**.* <br /><br />
 
 > ### View de notas fiscais de entrada WMS_NOTAFISCALITEMENTRADA
 
@@ -357,7 +359,8 @@ tipo,
 codProdutoErp,
 unidade,
 quantidade,
-valUnitario
+valUnitario,
+serie
 FROM NOTAFISCALITEMENTRADA
 ```
 
@@ -372,6 +375,7 @@ FROM NOTAFISCALITEMENTRADA
 **unidade:** *O campo deve ser **varchar(3)** contendo a abreviação da embalagem.* <br />
 **quantidade:** *O campo deve ser **numerico(12,4)** contendo a quantidade do produto, o campo e **obrigatorio**.* <br />
 **valUnitario:** *O campo deve ser **numerico(16,2)** contendo o valor unitario do produto, o campo e **obrigatorio**.* <br />
+**serie:** *O campo deve ser **inteiro)** contendo a serie da nota fiscal de entrada, o campo e **obrigatorio**.* <br /><br />
 
 > As Views de saída de produtos são todas as que compreendem processos aonde a mercadoria será separada para entrega, como por exemplo: Pedidos de venda, pedidos de
 devolução de produtos a fornecedores, pedidos de demonstração.
@@ -470,10 +474,104 @@ FROM PEDIDOSITEM
 
 > Após a importação de um movimento o Wms precisa retornar para o Erp que o movimento especifico ja foi recebido, esse retorno deve ocorrer por meio de uma stored procedure contendo os parametros necessarios para validação, uma vez executado o processo corretamente o movimento importado deve sair da View.
 
+**Após realizar a importação do movimento de entrada o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp, codNotaFiscalErp, codFornecedorErp e serie, o Erp precisa gravar em sua tabela que o mesmo foi importado e retirar da View de WMS_NOTAFISCALENTRADA.**
+
+``` 
+CREATE procedure [dbo].[sp_RetornoImpEntrada] 
+@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), @serie int as
+
+begin
+  update NOTAFISCALENTRADA SET WMS = 1 
+  WHERE 
+	codFilialERP = @codFiliaErp and 
+	codNotaFiscalErp = @codNotaFiscalErp and 
+	codFornecedorErp = @codFornecedorErp and
+  serie = @serie
+end
+```
+<br /><br />
+**Após realizar a importação do movimento de saida o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp e codPedidoErp o Erp precisa gravar em sua tabela que o mesmo foi importado e retirar da View de WMS_PEDIDOSCAB.**
+
+``` 
+CREATE procedure [dbo].[sp_RetornoImpPedido] 
+@codFiliaErp varchar(20), @codPedidoErp vatchar(20) as
+
+begin
+  update PEDIDO SET WMS = 1 
+  WHERE 
+	codFilialERP = @codFiliaErp and 
+	codPedidoErp = @codPedidoErp
+end
+```
+<br /><br />
 > ### Retorno após a exclusão de movimentos
 
 > Após a exclusão de um movimento o Wms precisa retornar para o Erp que o movimento especifico foi excluido, esse retorno deve ocorrer por meio de uma stored procedure contendo os parametros necessarios para validação, uma vez executado o processo corretamente o movimento excluido deve retornar para a View.
 
+**Após realizar a exclusão do movimento de entrada o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp, codNotaFiscalErp, codFornecedorErp e serie, o Erp precisa gravar em sua tabela que o mesmo esta disponivel e apresentar o movimento na view WMS_NOTAFISCALENTRADA.**
+
+``` 
+CREATE procedure [dbo].[sp_RetornoLiberaEntrada] 
+@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), @serie int as
+
+begin
+  update NOTAFISCALENTRADA SET WMS = 0 
+  WHERE 
+	codFilialERP = @codFiliaErp and 
+	codNotaFiscalErp = @codNotaFiscalErp and 
+	codFornecedorErp = @codFornecedorErp and
+  serie = @serie
+end
+```
+<br /><br />
+**Após realizar a exclusão do movimento de saida o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp e codPedidoErp o Erp precisa gravar em sua tabela que o mesmo foi esta disponivel e apresentar o movimento na View WMS_PEDIDOSCAB.**
+
+``` 
+CREATE procedure [dbo].[sp_RetornoLiberaPedido] 
+@codFiliaErp varchar(20), @codPedidoErp vatchar(20) as
+
+begin
+  update PEDIDO SET WMS = 0
+  WHERE 
+	codFilialERP = @codFiliaErp and 
+	codPedidoErp = @codPedidoErp
+end
+```
+<br /><br />
+
 > ### Retorno após a finalização de movimentos
 
 > Após a finalização de um movimento o Wms precisa retornar para o Erp que o movimento especifico ja foi finalizado, esse retorno deve ocorrer por meio de uma stored procedure contendo os parametros necessarios para validação, uma vez executado o processo corretamente o Erp precisa realizar as alterações necessarias para que o fluxo de seu processo ocorra normalmente.
+
+**Após realizar a finalização do movimento de entrada o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp, codNotaFiscalErp, codFornecedorErp e serie, o Erp precisa gravar em sua tabela os dados retornados referentes ao cabeçalho e itens das notas fiscais.**
+
+``` 
+CREATE procedure [dbo].[sp_RetornoImpEntrada] 
+@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), @serie int as
+
+begin
+  update NOTAFISCALENTRADA SET DataFimConferencia = 1 
+  WHERE 
+	codFilialERP = @codFiliaErp and 
+	codNotaFiscalErp = @codNotaFiscalErp and 
+	codFornecedorErp = @codFornecedorErp and
+  serie = @serie
+end
+```
+<br />
+
+``` 
+CREATE procedure [dbo].[sp_RetornoImpEntrada] 
+@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), @serie int as
+
+begin
+  update NOTAFISCALENTRADA SET DataFimConferencia = 1 
+  WHERE 
+	codFilialERP = @codFiliaErp and 
+	codNotaFiscalErp = @codNotaFiscalErp and 
+	codFornecedorErp = @codFornecedorErp and
+  serie = @serie
+end
+```
+
+<br /><br />
