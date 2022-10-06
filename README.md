@@ -520,7 +520,7 @@ begin
 	codFilialERP = @codFiliaErp and 
 	codNotaFiscalErp = @codNotaFiscalErp and 
 	codFornecedorErp = @codFornecedorErp and
-  serie = @serie
+  	serie = @serie
 end
 ```
 <br /><br />
@@ -543,34 +543,100 @@ end
 
 > Após a finalização de um movimento o Wms precisa retornar para o Erp que o movimento especifico ja foi finalizado, esse retorno deve ocorrer por meio de uma stored procedure contendo os parametros necessarios para validação, uma vez executado o processo corretamente o Erp precisa realizar as alterações necessarias para que o fluxo de seu processo ocorra normalmente.
 
-**Após realizar a finalização do movimento de entrada o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp, codNotaFiscalErp, codFornecedorErp e serie, o Erp precisa gravar em sua tabela os dados retornados referentes ao cabeçalho e itens das notas fiscais.**
+**Após realizar a finalização do movimento de entrada o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp, codNotaFiscalErp, codFornecedorErp e serie, o Erp precisa gravar em sua tabela os dados retornados referentes ao cabeçalho e itens das notas fiscais.** <br />
+
+**OBS: Os dados citados abaixo são somente para orientação eles devem ser ajustados para a realidade do Erp.** <br />
 
 ``` 
-CREATE procedure [dbo].[sp_RetornoImpEntrada] 
-@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), @serie int as
+CREATE procedure [dbo].[sp_RetornoExpEntrada] 
+@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), @serie int, @dataFimConferencia datetime as
 
 begin
-  update NOTAFISCALENTRADA SET DataFimConferencia = 1 
+  update NOTAFISCALENTRADA SET DataFimConferencia = '20220901 00:00:00' 
   WHERE 
 	codFilialERP = @codFiliaErp and 
 	codNotaFiscalErp = @codNotaFiscalErp and 
 	codFornecedorErp = @codFornecedorErp and
-  serie = @serie
+  	serie = @serie
 end
 ```
 <br />
 
 ``` 
-CREATE procedure [dbo].[sp_RetornoImpEntrada] 
-@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), @serie int as
+CREATE procedure [dbo].[sp_RetornoExpEntradaItem] 
+@codFiliaErp varchar(20), @codNotaFiscalErp vatchar(20), @codFornecedorErp varchar(20), 
+@serie int, @codProdutoErp = varchar(20), @qtdRecebida = numeric(10,4),
+@codFuncConf = varchar(20), @dtConferencia = datetime
+as
+
+Declare ItensEntrada Cursor for
+  Select codProdutoErp, qtdRecebida, codFuncConf, dtConferencia
+    from ItensNotaFiscalEntrada
+   where 
+   	codFiliaErp = @codFiliaErp and 
+	codNotaFiscalErp = @codNotaFiscalErp and 
+	codFornecedorErp = @codFornecedorErp and 
+	serie = @serie
+Open ItensEntrada
+fetch next from ItensEntrada into @codProdutoErp, @qtdRecebida, @codFuncConf, @dtConferencia
+while @@Fetch_Status = 0
+begin
+  Update ItensNotaFiscalEntrada set
+    qtdRecebida = @qtdRecebida,
+    codFuncConf = @codFuncConf,
+    dtConferencia = @dtConferencia
+  where codProdutoErp = @codProdutoErp
+end
+```
+
+<br /><br />
+
+
+**Após realizar a finalização do movimento de saida o Wms ira executar uma stored procedure passando como parametro os campos codFiliaErp e codPedidoErp, o Erp precisa gravar em sua tabela os dados retornados referentes ao cabeçalho e itens dos pedidos.** <br />
+
+**OBS: Os dados citados abaixo são somente para orientação eles devem ser ajustados para a realidade do Erp.** <br />
+
+``` 
+CREATE procedure [dbo].[sp_RetornoExpPedido] 
+@codFiliaErp varchar(20), @codPedidoErp vatchar(20), @dataFimConferencia datetime, @dataFimSeparacao datetime as
 
 begin
-  update NOTAFISCALENTRADA SET DataFimConferencia = 1 
+  update NOTAFISCALENTRADA SET 
+  	DataFimConferencia = @dataFimConferencia,
+	DataFimConferencia = @dataFimSeparacao 
   WHERE 
 	codFilialERP = @codFiliaErp and 
-	codNotaFiscalErp = @codNotaFiscalErp and 
-	codFornecedorErp = @codFornecedorErp and
-  serie = @serie
+	codPedidoErp = @codPedidoErp
+end
+```
+<br />
+
+``` 
+CREATE procedure [dbo].[sp_RetornoExpEntradaItem] 
+@codFiliaErp varchar(20), @codPedidoErp vatchar(20), @codProdutoErp = varchar(20), @item = varchar(5), @qtdSeparada = numeric(10,4), @qtdConferida = numeric(10,4),
+@codFuncConf = varchar(20), @codFuncSep = varchar(20), @dtFimConferencia = datetime, @dtFimSeparacao = datetime
+as
+
+Declare ItensPedido Cursor for
+  Select codProdutoErp, qtdSeparada, qtdConferida, codFuncConf, codFuncSep, dtFimConferencia, dtFimSeparacao, item
+    from ItensPedido
+   where 
+   	codFiliaErp = @codFiliaErp and 
+	codPedidoErp = @codPedidoErp
+Open ItensPedido
+fetch next from ItensPedido into @codProdutoErp, @qtdSeparada, @qtdConferida, @codFuncConf, @codFuncSep, @dtFimConferencia, @dtFimSeparacao, @item
+while @@Fetch_Status = 0
+begin
+  Update ItensPedido set
+    qtdSeparada = @qtdSeparada,
+    qtdConferida = @qtdConferida,
+    codFuncConf = @codFuncConf,
+    codFuncSep = @codFuncSep,
+    dtFimConferencia = @dtFimConferencia,
+    dtFimSeparacao = @dtFimSeparacao
+  where 
+  	codProdutoErp = @codProdutoErp and
+	item = @item
 end
 ```
 
