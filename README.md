@@ -25,7 +25,6 @@ FROM CIDADES
 ``` 
 CREATE VIEW WMS_CLIENTE AS 
 SELECT 
-codCliente,
 codClienteErp,
 tipo,
 cpfCnpj,
@@ -46,8 +45,7 @@ shelf
 FROM CLIENTES
 ```
 
-**codCliente:** *Somente enviar se o codigo do cliente for **inteiro**, contendo o codigo do cliente do ERP* <br />
-**codClienteErp:** *Somente enviar se o codigo do cliente for **varchar(20)**, contendo o codigo do cliente do ERP* <br />
+**codClienteErp:** *O campo deve ser **varchar(20)**, contendo o codigo do cliente do ERP o campo e chave primaria e **obrigatorio**.* <br />
 **tipo:** *O campo deve ser **inteiro** contendo 0 para pessoa fisica e 1 para pessoa juridica o campo e **obrigatorio**.* <br />
 **cpfCnpj:** *O campo deve ser **varchar(14)** contendo a inscrição da pessoa fisica ou juridica o campo e **obrigatorio**.* <br />
 **nomCliente:** *O campo deve ser **varchar(60)** contendo a razão social do cliente o campo e **obrigatorio**.* <br />
@@ -65,7 +63,6 @@ FROM CLIENTES
 **longitude:** *O campo deve ser **numeric(18,7)** contendo a longitude do cliente.* <br />
 **shelf:** *O campo deve ser **inteiro** contendo a quantidade de dias do shelf do cliente.* <br /><br />
 
-**Se o código do cliente for inteiro o campo codCliente e obrigatório se não o codClienteErp e obrigatório, somente preencher um dos 2.** <br />
 
 > ### View de embalagens WMS_EMBALAGEM
 
@@ -74,14 +71,15 @@ CREATE VIEW WMS_EMBALAGEM AS
 SELECT 
 codEmbalagem,
 codFilial,
-codProduto,
+codProdutoErp,
 aux,
 und,
 qtdUnit,
 embalagem,
 pesoLiquido,
 pesoBruto,
-volume
+volume,
+Ativo
 FROM EMBALAGENS
 ```
 
@@ -95,29 +93,35 @@ FROM EMBALAGENS
 **pesoLiquido:** *O campo deve ser **numeric(18,4)** contendo o peso liquido da embalagem.* <br />
 **pesoBruto:** *O campo deve ser **numeric(18,4** contendo o peso bruto da embalagem.* <br />
 **volume:** *O campo deve ser **numeric(18,2)** contendo a o volume em **m3** da embalagem.* <br />
+**ativo:** *O campo deve ser **inteiro** contendo 1 para ativo e 0 para inativo o campo e **obrigatorio**.* <br /><br />
 
 > ### View de estoque WMS_ESTOQUE
 
 ``` 
 CREATE VIEW WMS_ESTOQUE AS 
 SELECT 
-codFilial,
-codProduto,
-qtdEstoque
+codFilialErp,
+codProdutoErp,
+qtdEstoque,
+lote,
+validade,
+numeroSerie
 FROM ESTOQUE
 ```
 
-**codFilial:** *O campo deve ser **inteiro**, o mesmo e chave primaria o campo e **obrigatorio**.* <br />
-**codProduto:** *Chave estrangeira do codigo do produto o campo e **obrigatorio**.* <br />
+**codFilialErp:** *O campo deve ser **inteiro**, o mesmo e chave primaria o campo e **obrigatorio**.* <br />
+**codProdutoErp:** *Chave estrangeira do codigo do produto o campo e **obrigatorio**.* <br />
 **qtdEstoque:** *O campo deve ser **numerico(18,2)**, contendo a quantidade de estoque do produto o campo e **obrigatorio**.* <br />
+**lote:** *O campo deve ser **varchar(50)**, contendo o lote do produto.* <br />
+**validade:** *O campo deve ser **date**, contendo a data de validade do produto.* <br />
+**numeroSerie:** *O campo deve ser **varchar(50)**, contendo o numero de serie do produto.* <br /><br />
 
 > ### View de filial WMS_FILIAL
 
 ``` 
 CREATE VIEW WMS_FILIAL AS 
 SELECT 
-codFilial,
-codFilialWs,
+codFilialErp,
 nomFilial,
 nomFantasia,
 cnpj,
@@ -126,22 +130,18 @@ codCidadeIbge
 FROM FILIAL
 ```
 
-**codFilial:** *O campo deve ser **inteiro**, o mesmo e chave primaria.* <br />
-**codFilialWs:** *O campo deve ser **varchar(100)** contendo o codigo da filial se o valor não for inteiro.* <br />
+**codFilialErp:** *O campo deve ser **varchar(100)** contendo o codigo da filial esse campo e chave primaria e **obrigatorio**.* <br />
 **nomFilial:** *O campo deve ser **varchar(50)** contendo o nome da filial o campo e **obrigatorio**.* <br />
 **nomFantasia:** *O campo deve ser **varchar(50)** contendo a fantasia da filial o campo e **obrigatorio**.* <br />
 **cnpj:** *O campo deve ser **varchar(17)**, contendo o cnpj da filial o campo e **obrigatorio**.* <br />
 **ativo:** *O campo deve ser **inteiro**, contendo 1 para ativo e 0 para inativo o campo e **obrigatorio**.* <br />
 **codCidadeIbge:** *O campo deve ser **inteiro**, contendo o codigo da cidadeIbge.* <br /><br />
 
-**Se o código da filial for inteiro o campo codFilial e obrigatório, caso contrário, o campo codFilialWs será o campo obrigatório.** <br />
-
 > ### View de fornecedor WMS_FORNECEDOR
 
 ``` 
 CREATE VIEW WMS_FORNECEDOR AS 
 SELECT 
-codFornecedor,
 codFornecedorErp,
 nomeFornecedor,
 nomeFantasia,
@@ -155,8 +155,7 @@ cep
 FROM FORNECEDOR
 ```
 
-**codFornecedor:** *O campo deve ser **inteiro**, contendo o codigo do fornecedor.* <br />
-**codFornecedorErp:** *O campo deve ser **varchar(20)**, contendo o codigo do fornecedor se o mesmo for **alfanumerico**.* <br />
+**codFornecedorErp:** *O campo deve ser **varchar(20)**, contendo o codigo do fornecedor esse campo e chave primaria e **obrigatorio**.* <br />
 **nomeFornecedor:** *O campo deve ser **varchar(60)** contendo a razão social do fornecedor o campo e **obrigatorio**.* <br />
 **nomeFantasia:** *O campo deve ser **varchar(50)** contendo o nome fantasia do fornecedor o campo e **obrigatorio**.* <br />
 **tipo:** *O campo deve ser **inteiro** contendo 0 para pessoa fisica e 1 para pessoa juridica o campo e **obrigatorio**.* <br />
@@ -167,69 +166,49 @@ FROM FORNECEDOR
 **codCidadeIBGE:** *O campo deve ser **inteiro**, o mesmo e chave primaria o campo e **obrigatorio**.* <br />
 **cep:** *O campo deve ser **varchar(8)** contendo o contendo o codigo postal do fornecedor.* <br /><br />
 
-**Se o código do fornecedor for inteiro o campo codFornecedor e obrigatório, caso contrário, o campo codFornecedorErp será o campo obrigatório.** <br />
 
 > ### View de funcionario WMS_FUNCIONARIO
 
 ``` 
 CREATE VIEW WMS_FUNCIONARIO AS 
 SELECT 
-codFuncionario,
+codFuncionarioErp,
 nomefuncionario,
-cpf,
-codCidIbge,
-ativo,
-endereco,
-complemento,
-numero,
-cep,
-bairro
+ativo
 FROM FUNCIONARIO
 ```
 
-**codFuncionario:** *Para que o codigo do WMS e do ERP sejam os mesmos o campo deve ser **inteiro**, caso seja **alfanumerico** o WMS irá gerar sua propria numeração e guardar o codigo do ERP em outro campo o campo e **obrigatorio**.* <br />
+**codFuncionarioErp:** *O campo deve ser  **varchar(20)**, contendo o codigo do funcionario esse campo e chave primaria e **obrigatorio**.* <br />
 **nomefuncionario:** *O campo deve ser **varchar(60)** contendo o nome do funcionario o campo e **obrigatorio**.* <br />
-**cpf:** *O campo deve ser **varchar(50)** contendo o cpf do funcionario.* <br />
-**codCidIbge:** *O campo deve ser **inteiro**, o mesmo e chave primaria.* <br />
-**ativo:** *O campo deve ser **inteiro** contendo 0 para inativo e 1 para ativo o campo e **obrigatorio**.* <br />
-**endereco:** *O campo deve ser **varchar(60)** contendo o endereço do funcionario.* <br />
-**complemento:** *O campo deve ser **varchar(30)** contendo o complemento do endereco.* <br />
-**numero:** *O campo deve ser **varchar(10)** contendo o numero do endereço do funcionario.* <br />
-**cep:** *O campo deve ser **varchar(8)** contendo o contendo o codigo postal do funcionario.* <br />
-**bairro:** *O campo deve ser **varchar(30)** contendo a descrição do bairro do funcionario.* <br />
+**ativo:** *O campo deve ser **inteiro** contendo 0 para inativo e 1 para ativo o campo e **obrigatorio**.* <br /><br />
 
 > ### View de grupo de produto WMS_GRUPO
 
 ``` 
 CREATE VIEW WMS_GRUPO AS 
 SELECT 
-codGrupo,
-codGrupoExt,
+codGrupoErp,
 desGrupo,
 ativo
 FROM GRUPO
 ```
 
-**codGrupo:** *O campo deve ser **inteiro**, contendo o codigo do grupo se o mesmo for **inteiro**.* <br />
-**codGrupoExt:** *O campo deve ser **varchar(25)**, contendo o codigo do grupo se o mesmo for **alfanumerico**.* <br />
-**desGrupo:** *O campo deve ser **varchar(50)** contendo o nome do funcionario o campo e **obrigatorio**.* <br />
+**codGrupoErp:** *O campo deve ser **varchar(25)**, contendo o codigo do grupo esse campo e chave primaria e **obrigatorio**.* <br />
+**desGrupo:** *O campo deve ser **varchar(50)** contendo o nome do grupo o campo e **obrigatorio**.* <br />
 **ativo:** *O campo deve ser **inteiro** contendo 0 para inativo e 1 para ativo o campo e **obrigatorio**.* <br /><br />
-
-**Se o código do grupo for inteiro o campo codGrupo e obrigatório, caso contrário, o campo codGrupoExt será o campo obrigatório.** <br />
 
 > ### View de produto WMS_PRODUTO
 
 ``` 
 CREATE VIEW WMS_PRODUTO AS 
 SELECT 
-codProduto,
+codProdutoERP,
 descProd,
 situacao,
-refProd,
 revenda,
 vlrUltimaCompra,
-codFornecedor,
-codGrupo,
+codFornecedorErp,
+codGrupoErp,
 fracionado,
 qtdPallet,
 qtdCx,
@@ -237,18 +216,18 @@ controlaLote,
 controlaValidade,
 controlaFabricacao,
 controlaNumSerie,
-Shelf
+Shelf,
+diasVencimento
 FROM PRODUTO
 ```
 
-**codProduto:** *Para que o codigo do WMS e do ERP sejam os mesmos o campo deve ser **inteiro**, caso seja **alfanumerico** o WMS irá gerar sua propria numeração e guardar o codigo do ERP em outro campo.* <br />
+**codProdutoErp:** *O campo deve ser **vatchar(30)**, contendo o codigo do produto do ERP esse campo e chave primaria e **obrigatorio**.* <br />
 **descProd:** *O campo deve ser **varchar(50)** contendo a descrição do produto o campo e **obrigatorio**.* <br />
 **situacao:** *O campo deve ser **inteiro** contendo 0 para inativo e 1 para ativo o campo e **obrigatorio**.* <br />
-**refProd:** *O campo deve ser **varchar(10)** contendo a referencia do produto.* <br />
 **revenda:** *O campo deve ser **inteiro** contendo 0 para inativo e 1 para ativo.* <br />
 **vlrUltimaCompra:** *O campo deve ser **numerico(10,2)** contendo o preço de custo do produto.* <br />
-**codFornecedor:** *O Campo deve conter o codigo do fornecedor do produto.* <br />
-**codGrupo:** *O campo deve conter o codigo do grupo do produto o campo e **obrigatorio**.* <br />
+**codFornecedorErp:** *O Campo deve conter o codigo do fornecedor do produto.* <br />
+**codGrupoErp:** *O campo deve conter o codigo do grupo do produto o campo e **obrigatorio**.* <br />
 **fracionado:** *O campo deve ser **inteiro**, contendo 1 se o produto permitir quantidade fracionadas e 0 para não.* <br />
 **qtdPallet:** *O campo deve ser **numerico(10,2)**, contendo a quantidade que o palete suporta da menor unidade de estoque do produto.* <br />
 **qtdCx:** *O campo deve ser **numerico(10,2)**, contendo a quantidade da embalagem master do produto.* <br />
@@ -256,40 +235,97 @@ FROM PRODUTO
 **controlaValidade:** *O campo deve ser **inteiro**, contendo 1 para controla e 0 para não controla.* <br />
 **controlaFabricacao:** *O campo deve ser **inteiro**, contendo 1 para controla e 0 para não controla.* <br />
 **controlaNumSerie:** *O campo deve ser **inteiro**, contendo 1 para controla e 0 para não controla.* <br />
-**Shelf:** *O campo deve ser **inteiro**, contendo a quantidade de dias de shelf do produto.* <br /><br /><br />
+**Shelf:** *O campo deve ser **inteiro**, contendo a quantidade de dias de shelf do produto.* <br />
+**diasVencimento:** *O campo deve ser **inteiro**, contendo a quantidade de dias para geração do vencimento automatico do produto.* <br /><br /><br />
+
+> ### View de subgrupo de produto WMS_SUBGRUPO
+
+``` 
+CREATE VIEW WMS_SUBGRUPO AS 
+SELECT 
+codSubGrupoErp,
+desSubGrupo,
+ativo
+FROM SUBGRUPO
+```
+
+**codSubGrupoErp:** *O campo deve ser **varchar(25)**, contendo o codigo do subgrupo esse campo e chave primaria e **obrigatorio**.* <br />
+**desSubGrupo:** *O campo deve ser **varchar(50)** contendo o nome do subgrupo o campo e **obrigatorio**.* <br />
+**ativo:** *O campo deve ser **inteiro** contendo 0 para inativo e 1 para ativo o campo e **obrigatorio**.* <br /><br />
+
+> ### View de transportadora WMS_TRANSPORTADORA
+
+``` 
+CREATE VIEW WMS_TRANSPORTADORA AS 
+SELECT 
+codTransportadoraErp,
+nomeTransportadora,
+nomeFantasia,
+cpfCnpj,
+ativo
+FROM VEICULOS
+```
+
+**codTransportadoraErp:** *O campo deve ser **varchar(25)**, contendo o codigo da transportadora, esse campo e chave primaria e **obrigatorio**.* <br />
+**nomeTransportadora:** *O campo deve ser **varchar(100)**, contendo o nome da transportadora esse campo e **obrigatorio**.* <br />
+**nomeFantasia:** *O campo deve ser **varchar(100)**, contendo o nome fantasia da transportadora, esse campo e **obrigatorio**.* <br />
+**cpfCnpj:** *O campo deve ser **varchar(20)**, contendo a cpf ou cnpj da transportadora o campo e **obrigatorio**.* <br />
+**ativo:** *O campo deve ser **inteiro**, contendo 1 para ativo e 0 para inativo esse campo e **obrigatorio**.* <br /><br />
+
+> ### View de veiculos de produto WMS_VEICULO
+
+``` 
+CREATE VIEW WMS_VEICULOS AS 
+SELECT 
+codVeiculoErp,
+codTransportadoraErp,
+placa,
+descricao,
+pesoLiquido,
+pesoBruto,
+volume
+FROM VEICULOS
+```
+
+**codVeiculoErp:** *O campo deve ser **varchar(25)**, contendo o codigo do veiculo, esse campo e chave primaria e **obrigatorio**.* <br />
+**codTransportadoraErp:** *O campo deve ser **varchar(25)**, contendo o codigo da transportadora do veiculo.* <br />
+**placa:** *O campo deve ser **varchar(20)**, contendo a placa do veiculo o campo e **obrigatorio**.* <br />
+**descricao:** *O campo deve ser **varchar(100)**, contendo o nome do veiculo o campo e **obrigatorio**.* <br />
+**pesoLiquido:** *O campo deve ser **numeric(10,4)**, contendo o peso liquido do veiculo.* <br />
+**ativo:** *O campo deve ser **numeric(10,4)**, contendo o peso bruto do veiculo.* <br />
+**ativo:** *O campo deve ser **numeric(10,4)**, contendo o volume em m3 do veiculo.* <br /><br />
+
 
 # Importação de movimentos <br />
 
 > As Views de entrada de produtos são todas as que compreendem processos aonde a mercadoria será recebida, como por exemplo: Recebimento de notas fiscais de fornecedores, devoluções de clientes, devoluções de garantia.
 
-> ### View do bonus de entrada WMS_BONUSCAB
+> ### View de carga de entrada WMS_CARGA
 
 ``` 
-CREATE VIEW WMS_BONUSCAB AS 
+CREATE VIEW WMS_CARGA AS 
 SELECT 
-codBonusCab,
-codFilial,
+codCarga,
+codFilialErp,
 data
 FROM BONUSCAB
 ```
 
 **Somente deve conter essa View em caso de possuir o processo de agrupamentos de notas de entrada** <br />
 
-**codBonusCab:** *O campo deve ser **inteiro**, contendo o numero do bonus o campo e **obrigatorio**..* <br />
-**codFilial:** *O campo deve conter a chave da filial o campo e **obrigatorio**..* <br />
-**data:** *O campo deve ser **data** e deve conter a data de montagem do bonus o campo e **obrigatorio**..* <br />
+**codCarga:** *O campo deve ser **varchar(20)**, contendo o numero da carga de recebimento esse campo e **obrigatorio**.* <br />
+**codFilialErp:** *O campo deve conter a chave da filial o campo e **obrigatorio**..* <br />
+**data:** *O campo deve ser **data** e deve conter a data de montagem do bonus o campo e **obrigatorio**.* <br /><br />
 
 > ### View de notas fiscais de entrada WMS_NOTAFISCALENTRADA
 
 ``` 
 CREATE VIEW WMS_NOTAFISCALENTRADA AS 
 SELECT 
-codNotaFiscal,
-codFilial,
-codFilialIntegracao,
-codBonusCab,
-numNotaFiscal,
-codFornecedor,
+codNotaFiscalErp,
+codFilialErp,
+codCarga,
+codFornecedorErp,
 tipo,
 dtEmissao,
 valTotProduto,
@@ -297,48 +333,42 @@ valTotNotaFiscal
 FROM NOTAFISCALENTRADA
 ```
 
-**Somente colocar o campo codBonusCab se a importação for por bonus.** <br />
+**Somente colocar o campo codCarga se a importação for por carga.** <br />
 
-**codNotaFiscal:** *O campo deve ser **NULL**.* <br />
-**codFilial:** *O campo deve conter a chave da filial, o campo e **obrigatorio**..* <br />
-**codFilialIntegracao:** *O campo deve conter a chave da filial de origem (somente usar em casos de multi filial).* <br />
-**codBonusCab:** *O campo deve ser **inteiro**, contendo o numero do bonus, o campo e **obrigatorio**.* <br />
-**numNotaFiscal:** *O campo deve ser **inteiro**, contendo o numero da nota fiscal, o campo e **obrigatorio**.* <br />
-**codFornecedor:** *O Campo deve conter o codigo do fornecedor da nota, o campo e **obrigatorio**.* <br />
-**tipo:** *O campo deve ser **inteiro**, contendo o modelo do documento: Compra = 55, Devolução = 9, Transferencia = 8 e Produção = 11, o campo e **obrigatorio**.* <br />
+**codNotaFiscalErp:** *O campo deve ser **varchar(20)**, contendo o numero da nota fiscal esse campo e **obrigatorio**.* <br />
+**codFilialErp:** *O campo deve conter a chave da filial de origem.* <br />
+**codCarga:** *O campo deve ser **inteiro**, contendo o numero do bonus, o campo e **obrigatorio**.* <br />
+**codFornecedorErp:** *O Campo deve conter o codigo do fornecedor da nota, o campo e **obrigatorio**.* <br />
+**tipo:** *O campo deve ser **inteiro**, contendo o modelo do documento: Compra = 55, Devolução = 9, Transferencia = 8 e Produção = 11, Expresso = 2, o campo e **obrigatorio**.* <br />
 **dtEmissao:** *O campo deve ser **data** e deve conter a data de entrada da nota, campo e **obrigatorio**.* <br />
 **valTotProduto:** *O campo deve ser **numerico(18,2)** contendo a soma do valor total dos produtos, o campo e **obrigatorio**.* <br />
-**valTotNotaFiscal:** *O campo deve ser **numerico(15,2)** contendo o valor total da nota fiscal de entrada, o campo e **obrigatorio**.* <br />
+**valTotNotaFiscal:** *O campo deve ser **numerico(15,2)** contendo o valor total da nota fiscal de entrada, o campo e **obrigatorio**.* <br /><br />
 
 > ### View de notas fiscais de entrada WMS_NOTAFISCALITEMENTRADA
 
 ``` 
 CREATE VIEW WMS_NOTAFISCALITEMENTRADA AS 
 SELECT 
-codNotaFiscalItem,
-codNotaFiscal,
-codFilial,
-codFilialIntegracao,
-codBonusCab,
-codFornecedor,
+codNotaFiscalErp,
+codFilialErp,
+codCarga,
+codFornecedorErp,
 tipo,
-codProduto,
+codProdutoErp,
 unidade,
 quantidade,
 valUnitario
 FROM NOTAFISCALITEMENTRADA
 ```
 
-**Somente colocar o campo codBonusCab se a importação for por bonus.** <br />
+**Somente colocar o campo codCarga se a importação for por carga.** <br />
 
-**codNotaFiscalItem:** *O campo deve ser **NULL**.* <br />
-**codNotaFiscal:** *O campo deve ser **inteiro**, contendo o numero da nota fiscal, o campo e **obrigatorio**.* <br />
-**codFilial:** *O campo deve conter a chave da filial, o campo e **obrigatorio**.* <br />
-**codFilialIntegracao:** *O campo deve conter a chave da filial de origem (somente usar em casos de multi filial).* <br />
-**codBonusCab:** *O campo deve ser **inteiro**, contendo o numero do bonus, o campo e **obrigatorio**.* <br />
-**codFornecedor:** *O Campo deve conter o codigo do fornecedor da nota, o campo e **obrigatorio**.* <br />
-**tipo:** *O campo deve ser **inteiro**, contendo o modelo do documento: Compra = 55, Devolução = 9, Transferencia = 8 e Produção = 11, o campo e **obrigatorio**.* <br />
-**codProduto:** *Chave estrangeira do codigo do produto, o campo e **obrigatorio**.* <br />
+**codNotaFiscalErp:** *O campo deve ser **varchar(20)**, contendo o numero da nota fiscal, o campo e **obrigatorio**.* <br />
+**codFilialErp:** *O campo deve conter a chave da filial de origem.* <br />
+**codCarga:** *O campo deve ser **inteiro**, contendo o numero do bonus, o campo e **obrigatorio**.* <br />
+**codFornecedorErp:** *O Campo deve conter o codigo do fornecedor da nota, o campo e **obrigatorio**.* <br />
+**tipo:** *O campo deve ser **inteiro**, contendo o modelo do documento: Compra = 55, Devolução = 9, Transferencia = 8 e Produção = 11, Expresso = 2, o campo e **obrigatorio**.* <br />
+**codProdutoErp:** *Chave estrangeira do codigo do produto, o campo e **obrigatorio**.* <br />
 **unidade:** *O campo deve ser **varchar(3)** contendo a abreviação da embalagem.* <br />
 **quantidade:** *O campo deve ser **numerico(12,4)** contendo a quantidade do produto, o campo e **obrigatorio**.* <br />
 **valUnitario:** *O campo deve ser **numerico(16,2)** contendo o valor unitario do produto, o campo e **obrigatorio**.* <br />
@@ -346,53 +376,73 @@ FROM NOTAFISCALITEMENTRADA
 > As Views de saída de produtos são todas as que compreendem processos aonde a mercadoria será separada para entrega, como por exemplo: Pedidos de venda, pedidos de
 devolução de produtos a fornecedores, pedidos de demonstração.
 
+> ### View de carregamento WMS_CARREGAMENTO
+
+``` 
+CREATE VIEW WMS_CARREGAMENTO AS 
+SELECT 
+codCarregamentoErp,
+CodFilialERP,
+totalPedidos,
+dtGeracao,
+codVeiculo,
+destino,
+codTransportadora
+FROM PEDIDOSCAB
+```
+
+**codCarregamentoErp:** *O campo deve ser **varchar(20)**, contendo o numero do carregamento, esse campo e chave primaria e **obrigatorio**.* <br />
+**CodFilialERP:** *O campo deve conter a chave da filial de origem esse campo e **obrigatorio**.* <br />
+**totalPedidos:** *O Campo deve ser **inteiro**, contendo a quantidade de pedidos do carregamento, esse campo e **obrigatorio**.* <br />
+**dtGeracao:** *O Campo deve **datetime**, contendo a data de geração do carregamento, esse campo e **obrigatorio**.* <br />
+**codVeiculo:** *O campo deve conter a chave do veiculo.* <br />
+**destino:** *O campo deve ser **varchar(100)**, contendo a descrição do destino do carregamento.* <br />
+**codTransportadora:** *O campo deve conter a chave da transportadora.* <br /><br />
+
 > ### View de pedidos WMS_PEDIDOSCAB
 
 ``` 
 CREATE VIEW WMS_PEDIDOSCAB AS 
 SELECT 
-codPedidoCab,
-numDoc,
-codFilial,
-codFilialIntegracao,
-codCliente,
-codVendedor,
-numDoc,
+CodPedidoERP,
+CodFilialERP,
+codClienteErp,
+codFuncionarioErp,
 tipoPedido,
 odemPedido,
 dtGeracao,
 qtdTotalItens,
 valorTotal,
 obs,
-codRota
+codRota,
+desRota,
+codCarregamentoErp
 FROM PEDIDOSCAB
 ```
 
-**codPedidoCab:** *O campo so deve ser preenchido se o valor for **inteiro**, caso o contrario o campo deve ser **NULL**.* <br />
-**numDoc:** *O campo so deve ser preenchido se o valor do pedido for **NULL**, contendo o numero do pedido.* <br />
-**codFilial:** *O campo deve conter a chave da filial, o campo e **obrigatorio**.* <br />
-**codFilialIntegracao:** *O campo deve conter a chave da filial de origem (somente usar em casos de multi filial).* <br />
-**codCliente:** *O Campo deve conter o codigo do cliente do pedido, o campo e **obrigatorio**.* <br />
-**codVendedor:** *O Campo deve conter o codigo do funcionario da pedido, o campo e **obrigatorio**.* <br />
+**CodPedidoERP:** *O campo deve ser **varchar(20)**, contendo o numero do pedido, esse campo e chave primaria e **obrigatorio**.* <br />
+**CodFilialERP:** *O campo deve conter a chave da filial de origem (somente usar em casos de multi filial).* <br />
+**codClienteErp:** *O Campo deve conter o codigo do cliente do pedido, o campo e **obrigatorio**.* <br />
+**codFuncionarioErp:** *O Campo deve conter o codigo do funcionario da pedido, o campo e **obrigatorio**.* <br />
 **tipoPedido:** *O campo deve ser **varchar(20)**, contendo a descrição do tipo do pedido EX: Venda, Balcão, Bonificação, etc, o campo e **obrigatorio**.* <br />
 **odemPedido:** *O campo deve ser **inteiro**, contendo o nivel de prioridade do pedido, 0 – Urgente, 1 – Alta, 2 -Media, 3 – Baixa.* <br />
 **dtGeracao:** *O campo deve ser **data** e deve conter a data de emissão do pedido.* <br />
 **qtdTotalItens:** *O campo deve ser **inteiro** contendo a quantidade de itens no documento, o campo e **obrigatorio**.* <br />
 **valTotProduto:** *O campo deve ser **numerico(16,2)** contendo o valor total do documento, o campo e **obrigatorio**.* <br />
 **obs:** *O campo deve ser **nvarchar(1000)**, contendo a observação do pedido.* <br />
-**codRota:** *O campo deve ser **inteiro**, contendo o codigo da rota do pedido.* <br /><br />
+**codRota:** *O campo deve ser **inteiro**, contendo o codigo da rota do pedido.* <br />
+**desRota:** *O campo deve ser **varchar(100)**, contendo a descrição da rota do pedido.* <br />
+**desRota:** *O campo deve conter a chave do carregamento.* <br /><br />
 
-**Se o campo codigo do pedido for inteiro então o campo codPedidoCab e obrigatorio, se não, o campo numDoc e obrigatorio.** <br />
 
 > ### View de itens dos pedidos WMS_PEDIDOSITEM
 
 ``` 
 CREATE VIEW WMS_PEDIDOSITEM AS 
 SELECT 
-codPedidoItem,
 itemPedido,
-codPedidoCab,
-codFilial,
+codPedidoErp,
+codFilialErp,
 codProduto,
 valorUnitario,
 qtdProduto,
@@ -401,14 +451,23 @@ lote
 FROM PEDIDOSITEM
 ```
 
-**codPedidoItem:** *O campo deve ser **inteiro**, conter o codigo sequencial dos itens.* <br />
 **itemPedido:** *O campo deve ser **vatchar(10)**, conter o sequencial do item no pedido Ex: 0, 1, 2, 3, o campo e **obrigatorio**.* <br />
-**codPedidoCab:** *O campo deve conter a chave estrangeira do pedido, o campo e **obrigatorio**.* <br />
-**codFilial:** *O campo deve conter a chave da filial, o campo e **obrigatorio**.* <br />
-**codProduto:** *Chave estrangeira do codigo do produto, o campo e **obrigatorio**.* <br />
+**codPedidoErp:** *O campo deve conter a chave estrangeira do pedido, o campo e **obrigatorio**.* <br />
+**codFilialErp:** *O campo deve conter a chave da filial, o campo e **obrigatorio**.* <br />
+**codProdutoErp:** *Chave estrangeira do codigo do produto, o campo e **obrigatorio**.* <br />
 **valorUnitario:** *O campo deve ser **numerico(12,2)** contendo o valor unitario do produto, o campo e **obrigatorio**.* <br />
 **qtdProduto:** *O campo deve ser **numerico(12,4)** contendo a quantidade do produto, o campo e **obrigatorio**.* <br />
 **valorTotal:** *O campo deve ser **numerico(12,2)** contendo o valor total do produto, o campo e **obrigatorio**.* <br />
 **lote:** *O campo deve ser **varchar(15)**, conter a informação do lote que deve ser separado.* <br />
 
-**O campo lote somente deve ser preenchido se o produto controlar lote e se somente puder ser separado o lote informado do produto.** <br />
+**O campo lote somente deve ser preenchido se o produto controlar lote e se somente puder ser separado o lote informado do produto.** <br /><br />
+
+# Retorno de movimentos <br />
+
+> Os retornos de movimentos podem ser divididos em 3 tipos, retorno após a importação, retorno após a exclusão e retorno após a finalização do processo, os retornos servem para garantir que o processo ocorra em sintonia e sem necessidade de ações manuais no Erp.
+
+> ### Retorno após a importação de movimentos
+
+> ### Retorno após a exclusão de movimentos
+
+> ### Retorno após a finalização de movimentos
