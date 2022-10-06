@@ -466,8 +466,14 @@ FROM PEDIDOSITEM
 
 > Os retornos de movimentos podem ser divididos em 3 tipos, retorno após a importação, retorno após a exclusão e retorno após a finalização do processo, os retornos servem para garantir que o processo ocorra em sintonia e sem necessidade de ações manuais no Erp.
 
-> ### Retorno após a importação de movimentos
+> ### Retorno após a importação de movimentos 
+
+> Após a importação de um movimento o Wms precisa retornar para o Erp que o movimento especifico ja foi recebido, esse retorno deve ocorrer por meio de uma stored procedure contendo os parametros necessarios para validação, uma vez executado o processo corretamente o movimento importado deve sair da View.
 
 > ### Retorno após a exclusão de movimentos
 
+> Após a exclusão de um movimento o Wms precisa retornar para o Erp que o movimento especifico foi excluido, esse retorno deve ocorrer por meio de uma stored procedure contendo os parametros necessarios para validação, uma vez executado o processo corretamente o movimento excluido deve retornar para a View.
+
 > ### Retorno após a finalização de movimentos
+
+> Após a finalização de um movimento o Wms precisa retornar para o Erp que o movimento especifico ja foi finalizado, esse retorno deve ocorrer por meio de uma stored procedure contendo os parametros necessarios para validação, uma vez executado o processo corretamente o Erp precisa realizar as alterações necessarias para que o fluxo de seu processo ocorra normalmente.
