@@ -85,7 +85,7 @@ FROM EMBALAGENS
 
 **codEmbalagem:** *Enviar o campo como **NULL**.* <br />
 **codFilial:** *O campo deve ser **inteiro**, o mesmo e chave primaria o campo e **obrigatorio**.* <br />
-**codProduto:** *O campo deve possuir a chave estrangeira do produto o campo e **obrigatorio**.* <br />
+**codProdutoErp:** *O campo deve possuir a chave estrangeira do produto o campo e **obrigatorio**.* <br />
 **aux:** *O campo deve ser **varchar(20)** contendo o codigo de barras do produto o campo e **obrigatorio**.* <br />
 **und:** *O campo deve ser **varchar(3)** contendo a descrição reduzida da embalagem o campo e **obrigatorio**.* <br />
 **qtdUnit:** *O campo deve ser **numerico(12,2)**, contendo o fator de conversão da unidade o campo e **obrigatorio** e tem de ser diferente de zero.* <br />
