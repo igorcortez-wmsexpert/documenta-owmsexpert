@@ -326,6 +326,7 @@ codNotaFiscalErp,
 codFilialErp,
 codCarga,
 codFornecedorErp,
+dadosAdicionais,
 tipo,
 dtEmissao,
 valTotProduto,
@@ -340,6 +341,7 @@ FROM NOTAFISCALENTRADA
 **codFilialErp:** *O campo deve conter a chave da filial de origem.* <br />
 **codCarga:** *O campo deve ser **inteiro**, contendo o numero do bonus, o campo e **obrigatorio**.* <br />
 **codFornecedorErp:** *O Campo deve conter o codigo do fornecedor da nota, o campo e **obrigatorio**.* <br />
+**dadosAdicionais:** *O campo deve ser **varchar(200)**, e deve contes complementos da nota.* <br />
 **tipo:** *O campo deve ser **inteiro**, contendo o modelo do documento: Compra = 55, Devolução = 9, Transferencia = 8 e Produção = 11, Expresso = 2, o campo e **obrigatorio**.* <br />
 **dtEmissao:** *O campo deve ser **data** e deve conter a data de entrada da nota, campo e **obrigatorio**.* <br />
 **valTotProduto:** *O campo deve ser **numerico(18,2)** contendo a soma do valor total dos produtos, o campo e **obrigatorio**.* <br />
