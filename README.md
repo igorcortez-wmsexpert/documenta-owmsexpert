@@ -292,8 +292,8 @@ FROM VEICULOS
 **placa:** *O campo deve ser **varchar(20)**, contendo a placa do veiculo o campo e **obrigatorio**.* <br />
 **descricao:** *O campo deve ser **varchar(100)**, contendo o nome do veiculo o campo e **obrigatorio**.* <br />
 **pesoLiquido:** *O campo deve ser **numeric(10,4)**, contendo o peso liquido do veiculo.* <br />
-**ativo:** *O campo deve ser **numeric(10,4)**, contendo o peso bruto do veiculo.* <br />
-**ativo:** *O campo deve ser **numeric(10,4)**, contendo o volume em m3 do veiculo.* <br /><br />
+**pesoBruto:** *O campo deve ser **numeric(10,4)**, contendo o peso bruto do veiculo.* <br />
+**volume:** *O campo deve ser **numeric(10,4)**, contendo o volume em m3 do veiculo.* <br /><br />
 
 
 # Importação de movimentos <br />
