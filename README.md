@@ -122,8 +122,8 @@ FROM ESTOQUE
 CREATE VIEW WMS_FILIAL AS 
 SELECT 
 codFilialErp,
-nomFilial,
-nomFantasia,
+nomeFilial,
+nomeFantasia,
 cnpj,
 ativo,
 codCidadeIbge
@@ -131,8 +131,8 @@ FROM FILIAL
 ```
 
 **codFilialErp:** *O campo deve ser **varchar(100)** contendo o codigo da filial esse campo e chave primaria e **obrigatorio**.* <br />
-**nomFilial:** *O campo deve ser **varchar(50)** contendo o nome da filial o campo e **obrigatorio**.* <br />
-**nomFantasia:** *O campo deve ser **varchar(50)** contendo a fantasia da filial o campo e **obrigatorio**.* <br />
+**nomeFilial:** *O campo deve ser **varchar(50)** contendo o nome da filial o campo e **obrigatorio**.* <br />
+**nomeFantasia:** *O campo deve ser **varchar(50)** contendo a fantasia da filial o campo e **obrigatorio**.* <br />
 **cnpj:** *O campo deve ser **varchar(17)**, contendo o cnpj da filial o campo e **obrigatorio**.* <br />
 **ativo:** *O campo deve ser **inteiro**, contendo 1 para ativo e 0 para inativo o campo e **obrigatorio**.* <br />
 **codCidadeIbge:** *O campo deve ser **inteiro**, contendo o codigo da cidadeIbge.* <br /><br />
